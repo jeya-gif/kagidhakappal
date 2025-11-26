@@ -1,0 +1,124 @@
+/* src/components/Home.css */
+.home-section {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 100px 60px 60px;
+  background: #000;
+}
+
+.home-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 60px;
+  max-width: 1400px;
+  width: 100%;
+}
+
+.home-text {
+  flex: 1;
+  animation: fadeInLeft 1s ease;
+}
+
+.home-title {
+  font-size: 72px;
+  font-weight: 900;
+  color: white;
+  margin: 0;
+  line-height: 1.2;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-family: 'Impact', 'Arial Black', sans-serif;
+}
+
+.home-subtitle {
+  font-size: 24px;
+  color: #00d4ff;
+  margin-top: 20px;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.home-animation {
+  flex: 1;
+  max-width: 500px;
+  animation: fadeInRight 1s ease;
+}
+
+/* Animations */
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .home-content {
+    gap: 40px;
+  }
+
+  .home-title {
+    font-size: 56px;
+  }
+
+  .home-subtitle {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .home-section {
+    padding: 80px 30px 40px;
+  }
+
+  .home-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 30px;
+  }
+
+  .home-title {
+    font-size: 42px;
+  }
+
+  .home-subtitle {
+    font-size: 18px;
+  }
+
+  .home-animation {
+    max-width: 350px;
+  }
+}
+
+@media (max-width: 480px) {
+  .home-title {
+    font-size: 32px;
+  }
+
+  .home-subtitle {
+    font-size: 16px;
+  }
+
+  .home-animation {
+    max-width: 280px;
+  }
+}

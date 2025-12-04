@@ -1,48 +1,98 @@
+// src/components/Services.jsx
 import React, { useState, useEffect } from "react";
 import "./Services.css";
 
 const servicesData = [
   {
-    title: "Academic Writing Services",
+    id: "mini-projects",
+    title: "Mini Projects ",
     points: [
-      "Leave Letter Creation",
-      "College Report Writing",
-      "Project Documentation",
-      "Assignment Writing",
+      "Python mini projects",
+      "AI/ML models",
+      "IoT simple prototypes",
+      "AR/VR Unity demos",
+      "Web mini projects",
+      "Mobile app mini projects",
+      "Database projects",
     ],
   },
   {
-    title: "Portfolio & Resume Services",
+    id: "final-year",
+    title: "Final Year Projects",
     points: [
-      "Resume Building",
-      "Portfolio Website Creation",
-      "LinkedIn Profile Setup",
+      "B.E / B.Tech / Arts / Diploma",
+      "CSE / IT / ECE / EEE",
+      "Mechanical / Civil",
+      "B.Sc / BCA",
     ],
   },
   {
-    title: "Mini Project Development",
+    id: "document-services",
+    title: "Document Services",
     points: [
-      "Python Mini Projects",
-      "Machine Learning Mini Projects",
-      "Unity/AR Demo Projects",
-      "Web Mini Projects (HTML/CSS/JS)",
+      "Portfolio creation",
+      "Resume building",
+      "Mini project report",
+      "Final year project report",
+      "Research paper writing",
     ],
   },
   {
-    title: "Design & Presentation",
+    id: "design-services",
+    title: "Design Services",
     points: [
-      "PowerPoint Creation",
-      "Poster Design",
-      "Template Design",
+      "Logo designing",
+      "Poster / banner designing",
+      "College event poster kits",
+      "Business card",
     ],
   },
   {
-    title: "Technical Support",
+    id: "web-app-services",
+    title: "Website & App Services",
     points: [
-      "GitHub Setup",
-      "Website Hosting Help",
-      "Debugging & Project Fixing",
+      "Personal portfolio website",
+      "Business website",
+      "E-commerce mini website",
+      "Blog website",
+      "Simple Android app",
     ],
+  },
+  {
+    id: "tech-support",
+    title: "Tech Support Services",
+    points: [
+      "Hosting setup",
+      "Domain setup",
+      "GitHub project upload",
+      "Cloud deployment",
+    ],
+  },
+  // Packages
+  {
+    id: "student-starter",
+    title: "Student Starter Package",
+    points: ["Portfolio", "Resume", "Mini project", "Mini project report"],
+  },
+  {
+    id: "final-year-package",
+    title: "Final Year Package",
+    points: [
+      "Final year project",
+      "Full documentation",
+      "PPT + Viva questions",
+      "Deployment",
+    ],
+  },
+  {
+    id: "design-package",
+    title: "Design Package",
+    points: ["Logo", "Poster", "ID card design", "Brochure"],
+  },
+  {
+    id: "developer-package",
+    title: "Developer Package",
+    points: ["Website", "App", "Deployment", "Domain + hosting setup"],
   },
 ];
 
@@ -63,29 +113,46 @@ export default function Services() {
   useEffect(() => {
     const interval = setInterval(() => {
       nextService();
-    }, 2500);
+    }, 3000);
     return () => clearInterval(interval);
   }, []);
+
+  // Navigate to order page with query param
+  const goToOrder = (service) => {
+    const encoded = encodeURIComponent(service);
+    // Open order page route - change to your route if different
+    window.location.href = `/order?service=${encoded}`;
+  };
 
   return (
     <section id="services" className="services-section">
       <h2 className="services-title">SERVICES</h2>
 
       <div className="carousel-wrapper">
-        <button className="nav-btn left" onClick={prevService}>‹</button>
+        <button className="nav-btn left" onClick={prevService}>
+          ‹
+        </button>
 
         <div className="big-circle">
-          <div key={currentIndex} className="service-bubble">
+          <div
+            key={servicesData[currentIndex].id}
+            className="service-bubble clickable"
+            onClick={() => goToOrder(servicesData[currentIndex].title)}
+            title="Click to place an order for this service"
+          >
             <h3>{servicesData[currentIndex].title}</h3>
             <ul>
               {servicesData[currentIndex].points.map((p, i) => (
                 <li key={i}>{p}</li>
               ))}
             </ul>
+            <div className="bubble-cta">Place Order →</div>
           </div>
         </div>
 
-        <button className="nav-btn right" onClick={nextService}>›</button>
+        <button className="nav-btn right" onClick={nextService}>
+          ›
+        </button>
       </div>
     </section>
   );

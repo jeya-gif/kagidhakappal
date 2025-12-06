@@ -28,7 +28,7 @@ export default function Contact() {
     try {
       await send(
         "service_up8e6co",
-        "template_975r8ez",
+        "template_976wpwg",
         {
           from_name: form.name,
           from_email: form.email,

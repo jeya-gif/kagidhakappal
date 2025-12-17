@@ -22,28 +22,27 @@ export default function OrderForm() {
   const [sending, setSending] = useState(false);
 
   useEffect(() => {
-    // parse service from URL
     const params = new URLSearchParams(window.location.search);
     const svc = params.get("service");
     if (svc) setForm((f) => ({ ...f, service: decodeURIComponent(svc) }));
   }, []);
 
-  // Option lists (you can expand or map more complex ones)
+  // Sub-option lists (REMOVED department options)
   const subOptionsMap = {
-    "Mini Projects (All Departments)": [
+    "Mini Projects": [
       "Python mini projects",
       "AI/ML models",
       "IoT prototypes",
       "AR/VR Unity demos",
       "Web mini projects",
     ],
-    "Final Year Projects (B.E / B.Tech / Arts / Diploma)": [
-      "AI & Data Science",
-      "CSE / IT / ECE / EEE",
-      "Mechanical / Civil",
-      "B.Sc / BCA",
+    "Final Year Projects": [
+      "AI & Data Science projects",
+      "CSE / IT projects",
+      "ECE / EEE projects",
+      "Mechanical / Civil projects",
     ],
-    "Document Services (Fast, Easy & High Profit)": [
+    "Document Services": [
       "Portfolio creation",
       "Resume building",
       "Mini project report",
@@ -67,14 +66,23 @@ export default function OrderForm() {
       "GitHub upload",
       "Cloud deployment",
     ],
-    "Student Starter Package": ["Portfolio", "Resume", "Mini project", "Report"],
-    "Final Year Package": ["Project", "Documentation", "PPT + Viva", "Deployment"],
-    "Design Package": ["Logo", "Poster", "ID card", "Brochure"],
-    "Developer Package": ["Website", "App", "Deployment", "Domain + Hosting"],
+    "Student Starter Package": [
+      "Portfolio",
+      "Resume",
+      "Mini project",
+      "Report",
+    ],
+    "Final Year Package": [
+      "Project",
+      "Documentation",
+      "PPT + Viva",
+      "Deployment",
+    ],
   };
 
   const currentOptions =
-    subOptionsMap[form.service] || Object.values(subOptionsMap).flat();
+    subOptionsMap[form.subOption] ||
+    Object.values(subOptionsMap).flat();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -108,20 +116,17 @@ export default function OrderForm() {
     };
 
     try {
-      // Replace with your EmailJS service/template/user IDs (setup steps below)
       await send(
-        "service_up8e6co", // <-- service ID
-        "template_975r8ez", // <-- template ID
+        "service_up8e6co",
+        "template_975r8ez",
         templateParams,
-        "Pk6Bfm980E5eHf41v" // <-- public key (user id)
+        "Pk6Bfm980E5eHf41v"
       );
       alert("Order sent successfully! We will contact you soon.");
       setForm(defaultFields);
     } catch (err) {
       console.error("Email send error:", err);
-      alert(
-        "Failed to send order via email. The WhatsApp option is available below. Also check EmailJS configuration."
-      );
+      alert("Failed to send order. WhatsApp option is available.");
     } finally {
       setSending(false);
     }
@@ -141,7 +146,6 @@ Payment: ${form.paymentMethod}
 Message: ${form.message || "-"}
 
 Please contact me.`;
-    const phone = "919994940613x"; // replace with your receiving WhatsApp number (with country code, no +)
     return `https://wa.me/919994940613?text=${encodeURIComponent(text)}`;
   };
 
@@ -149,7 +153,6 @@ Please contact me.`;
     <section className="order-section">
       <div className="order-card">
         <h2 className="order-title">Place Your Order</h2>
-        <p className="order-sub">Service: <strong>{form.service || "Choose from Services"}</strong></p>
 
         <form className="order-form" onSubmit={sendEmail}>
           <label>
@@ -167,16 +170,24 @@ Please contact me.`;
             <input name="phone" value={form.phone} onChange={handleChange} required />
           </label>
 
+          {/* UPDATED SERVICE SELECT */}
           <label>
-            Select Service
-            <input name="service" value={form.service} onChange={handleChange} />
+            Select Service *
+            <select name="service" value={form.service} onChange={handleChange} required>
+              <option value="">-- Select --</option>
+              <option value="AI & DATA SCIENCE">AI & DATA SCIENCE</option>
+              <option value="CSE / IT / EEE / ECE">CSE / IT / EEE / ECE</option>
+              <option value="MECHANICAL / CIVIL">MECHANICAL / CIVIL</option>
+              <option value="B.SC / BCA">B.SC / BCA</option>
+            </select>
           </label>
 
+          {/* SUB OPTION */}
           <label>
             Sub-option / Package
             <select name="subOption" value={form.subOption} onChange={handleChange}>
               <option value="">-- Select --</option>
-              {currentOptions.map((opt, idx) => (
+              {Object.values(subOptionsMap).flat().map((opt, idx) => (
                 <option key={idx} value={opt}>{opt}</option>
               ))}
             </select>
@@ -185,18 +196,18 @@ Please contact me.`;
           <div className="row">
             <label>
               Deadline
-              <input name="deadline" value={form.deadline} onChange={handleChange} placeholder="YYYY-MM-DD or weeks" />
+              <input name="deadline" value={form.deadline} onChange={handleChange} />
             </label>
 
             <label>
               Budget
-              <input name="budget" value={form.budget} onChange={handleChange} placeholder="e.g. 3000 INR" />
+              <input name="budget" value={form.budget} onChange={handleChange} />
             </label>
           </div>
 
           <label>
-            Needed record / documents for this project?
-            <input name="documentsNeeded" value={form.documentsNeeded} onChange={handleChange} placeholder="Files, repo links etc." />
+            Needed documents
+            <input name="documentsNeeded" value={form.documentsNeeded} onChange={handleChange} />
           </label>
 
           <label>
@@ -208,20 +219,25 @@ Please contact me.`;
           </label>
 
           <label>
-            Message / Requirements
-            <textarea name="message" value={form.message} onChange={handleChange} rows="5" />
+            Message
+            <textarea name="message" value={form.message} onChange={handleChange} rows="4" />
           </label>
 
           <div className="form-actions">
-            <button type="submit" disabled={sending}>{sending ? "Sending..." : "Send Order (Email)"}</button>
+            <button type="submit" disabled={sending}>
+              {sending ? "Sending..." : "Send Order (Email)"}
+            </button>
 
-            <a className="whatsapp-btn" href={makeWhatsAppLink()} target="_blank" rel="noopener noreferrer">
+            <a
+              className="whatsapp-btn"
+              href={makeWhatsAppLink()}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               Send via WhatsApp
             </a>
           </div>
         </form>
-
-        <p className="note">We will reply to email or WhatsApp. Choose your preferred method.</p>
       </div>
     </section>
   );

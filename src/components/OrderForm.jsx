@@ -2,19 +2,18 @@
 import React, { useState, useEffect } from "react";
 import "./OrderForm.css";
 import { send } from "@emailjs/browser";
-import { Phone, Mail, CheckSquare } from "lucide-react";
 
 const defaultFields = {
   name: "",
   email: "",
   phone: "",
+  service: "",
+  subOption: "",
   deadline: "",
   budget: "",
   documentsNeeded: "",
   paymentMethod: "COD",
   message: "",
-  service: "",
-  subOption: "",
 };
 
 export default function OrderForm() {
@@ -27,62 +26,55 @@ export default function OrderForm() {
     if (svc) setForm((f) => ({ ...f, service: decodeURIComponent(svc) }));
   }, []);
 
-  // Sub-option lists (REMOVED department options)
-  const subOptionsMap = {
-    "Mini Projects": [
-      "Python mini projects",
-      "AI/ML models",
-      "IoT prototypes",
-      "AR/VR Unity demos",
-      "Web mini projects",
-    ],
-    "Final Year Projects": [
-      "AI & Data Science projects",
-      "CSE / IT projects",
-      "ECE / EEE projects",
-      "Mechanical / Civil projects",
-    ],
-    "Document Services": [
-      "Portfolio creation",
-      "Resume building",
-      "Mini project report",
-      "Final year project report",
-    ],
-    "Design Services": [
-      "Logo designing",
-      "Poster / banner designing",
-      "College event poster kits",
-      "Business card",
-    ],
-    "Website & App Services": [
-      "Personal portfolio website",
-      "Business website",
-      "E-commerce mini website",
-      "Simple Android app",
-    ],
-    "Tech Support Services": [
-      "Hosting setup",
-      "Domain setup",
-      "GitHub upload",
-      "Cloud deployment",
-    ],
-    "Student Starter Package": [
-      "Portfolio",
-      "Resume",
-      "Mini project",
-      "Report",
-    ],
-    "Final Year Package": [
-      "Project",
-      "Documentation",
-      "PPT + Viva",
-      "Deployment",
-    ],
-  };
+  /* ✅ ALL SERVICES / PACKAGES (NO DEPARTMENTS HERE) */
+  const subOptions = [
+    // Mini Projects
+    "Python Mini Projects",
+    "AI / ML Mini Projects",
+    "IoT Mini Projects",
+    "Web Development Mini Projects",
+    "AR / VR Unity Mini Projects",
 
-  const currentOptions =
-    subOptionsMap[form.subOption] ||
-    Object.values(subOptionsMap).flat();
+    // Final Year Projects
+    "Final Year Project (Complete)",
+    "Final Year Project + Documentation",
+    "Final Year Project + PPT & Viva",
+    "Final Year Project + Deployment",
+
+    // Document Services
+    "Resume Building",
+    "Portfolio Creation",
+    "Mini Project Report",
+    "Final Year Project Report",
+    "IEEE Paper Formatting",
+
+    // Design Services
+    "Logo Designing",
+    "Poster / Banner Designing",
+    "College Event Poster Kit",
+    "Business Card Design",
+    "Brochure / Flyer Design",
+
+    // Website & App Services
+    "Personal Portfolio Website",
+    "Business Website",
+    "E-commerce Mini Website",
+    "Landing Page Website",
+    "Simple Android App",
+
+    // Tech Support Services
+    "Domain Setup",
+    "Hosting Setup",
+    "GitHub Upload",
+    "Cloud Deployment",
+    "Website Bug Fixing",
+
+    // Packages
+    "Student Starter Package (Resume + Portfolio + Mini Project)",
+    "Final Year Package (Project + Report + PPT + Viva)",
+    "Design Package (Logo + Poster + ID Card + Brochure)",
+    "Developer Package (Website + App + Deployment)",
+  ];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -90,62 +82,64 @@ export default function OrderForm() {
   };
 
   const validate = () => {
-    if (!form.name || !form.email || !form.phone || !form.service) return false;
-    return true;
+    return form.name && form.email && form.phone && form.service;
   };
 
   const sendEmail = async (e) => {
     e.preventDefault();
+
     if (!validate()) {
-      alert("Please fill name, email, phone and service.");
+      alert("Please fill Name, Email, Phone and Department.");
       return;
     }
-    setSending(true);
 
-    const templateParams = {
-      from_name: form.name,
-      from_email: form.email,
-      phone: form.phone,
-      service: form.service,
-      sub_option: form.subOption,
-      deadline: form.deadline,
-      budget: form.budget,
-      documents_needed: form.documentsNeeded,
-      payment_method: form.paymentMethod,
-      message: form.message,
-    };
+    setSending(true);
 
     try {
       await send(
         "service_up8e6co",
         "template_975r8ez",
-        templateParams,
+        {
+          from_name: form.name,
+          from_email: form.email,
+          phone: form.phone,
+          service: form.service,
+          sub_option: form.subOption,
+          deadline: form.deadline,
+          budget: form.budget,
+          documents_needed: form.documentsNeeded,
+          payment_method: form.paymentMethod,
+          message: form.message,
+        },
         "Pk6Bfm980E5eHf41v"
       );
-      alert("Order sent successfully! We will contact you soon.");
+
+      alert("Order sent successfully!");
       setForm(defaultFields);
-    } catch (err) {
-      console.error("Email send error:", err);
-      alert("Failed to send order. WhatsApp option is available.");
+    } catch (error) {
+      alert("Failed to send order. Please try WhatsApp.");
     } finally {
       setSending(false);
     }
   };
 
   const makeWhatsAppLink = () => {
-    const text = `Hi, I want to place an order.
-Service: ${form.service}
-Sub-option: ${form.subOption || "-"}
+    const text = `
+📌 New Order Request
+
+Department: ${form.service}
+Service / Package: ${form.subOption || "-"}
 Name: ${form.name}
-Email: ${form.email}
 Phone: ${form.phone}
+Email: ${form.email}
 Budget: ${form.budget || "-"}
 Deadline: ${form.deadline || "-"}
-Docs needed: ${form.documentsNeeded || "-"}
+Documents: ${form.documentsNeeded || "-"}
 Payment: ${form.paymentMethod}
-Message: ${form.message || "-"}
 
-Please contact me.`;
+Message:
+${form.message || "-"}
+    `;
     return `https://wa.me/919994940613?text=${encodeURIComponent(text)}`;
   };
 
@@ -155,73 +149,96 @@ Please contact me.`;
         <h2 className="order-title">Place Your Order</h2>
 
         <form className="order-form" onSubmit={sendEmail}>
-          <label>
-            Your full name *
-            <input name="name" value={form.name} onChange={handleChange} required />
-          </label>
+          <input
+            name="name"
+            placeholder="Your Full Name *"
+            value={form.name}
+            onChange={handleChange}
+            required
+          />
 
-          <label>
-            Email *
-            <input type="email" name="email" value={form.email} onChange={handleChange} required />
-          </label>
+          <input
+            type="email"
+            name="email"
+            placeholder="Email Address *"
+            value={form.email}
+            onChange={handleChange}
+            required
+          />
 
-          <label>
-            Phone *
-            <input name="phone" value={form.phone} onChange={handleChange} required />
-          </label>
+          <input
+            name="phone"
+            placeholder="Phone Number *"
+            value={form.phone}
+            onChange={handleChange}
+            required
+          />
 
-          {/* UPDATED SERVICE SELECT */}
-          <label>
-            Select Service *
-            <select name="service" value={form.service} onChange={handleChange} required>
-              <option value="">-- Select --</option>
-              <option value="AI & DATA SCIENCE">AI & DATA SCIENCE</option>
-              <option value="CSE / IT / EEE / ECE">CSE / IT / EEE / ECE</option>
-              <option value="MECHANICAL / CIVIL">MECHANICAL / CIVIL</option>
-              <option value="B.SC / BCA">B.SC / BCA</option>
-            </select>
-          </label>
+          {/* ✅ DEPARTMENT SELECT */}
+          <select
+            name="service"
+            value={form.service}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Select Department *</option>
+            <option value="AI & DATA SCIENCE">AI & DATA SCIENCE</option>
+            <option value="CSE / IT / EEE / ECE">CSE / IT / EEE / ECE</option>
+            <option value="MECHANICAL / CIVIL">MECHANICAL / CIVIL</option>
+            <option value="B.SC / BCA">B.SC / BCA</option>
+          </select>
 
-          {/* SUB OPTION */}
-          <label>
-            Sub-option / Package
-            <select name="subOption" value={form.subOption} onChange={handleChange}>
-              <option value="">-- Select --</option>
-              {Object.values(subOptionsMap).flat().map((opt, idx) => (
-                <option key={idx} value={opt}>{opt}</option>
-              ))}
-            </select>
-          </label>
+          {/* ✅ ALL SERVICES / PACKAGES */}
+          <select
+            name="subOption"
+            value={form.subOption}
+            onChange={handleChange}
+          >
+            <option value="">Select Service / Package</option>
+            {subOptions.map((opt, index) => (
+              <option key={index} value={opt}>
+                {opt}
+              </option>
+            ))}
+          </select>
 
-          <div className="row">
-            <label>
-              Deadline
-              <input name="deadline" value={form.deadline} onChange={handleChange} />
-            </label>
+          <input
+            name="deadline"
+            placeholder="Deadline (date / weeks)"
+            value={form.deadline}
+            onChange={handleChange}
+          />
 
-            <label>
-              Budget
-              <input name="budget" value={form.budget} onChange={handleChange} />
-            </label>
-          </div>
+          <input
+            name="budget"
+            placeholder="Budget (e.g. 3000 INR)"
+            value={form.budget}
+            onChange={handleChange}
+          />
 
-          <label>
-            Needed documents
-            <input name="documentsNeeded" value={form.documentsNeeded} onChange={handleChange} />
-          </label>
+          <input
+            name="documentsNeeded"
+            placeholder="Documents / Files needed"
+            value={form.documentsNeeded}
+            onChange={handleChange}
+          />
 
-          <label>
-            Payment method
-            <select name="paymentMethod" value={form.paymentMethod} onChange={handleChange}>
-              <option value="COD">COD</option>
-              <option value="Online">Online Payment</option>
-            </select>
-          </label>
+          <select
+            name="paymentMethod"
+            value={form.paymentMethod}
+            onChange={handleChange}
+          >
+            <option value="COD">Cash on Delivery</option>
+            <option value="Online">Online Payment</option>
+          </select>
 
-          <label>
-            Message
-            <textarea name="message" value={form.message} onChange={handleChange} rows="4" />
-          </label>
+          <textarea
+            name="message"
+            placeholder="Additional Requirements"
+            rows="4"
+            value={form.message}
+            onChange={handleChange}
+          />
 
           <div className="form-actions">
             <button type="submit" disabled={sending}>
